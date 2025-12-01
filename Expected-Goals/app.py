@@ -59,10 +59,10 @@ if model_loaded:
     
     # Initialize session state for positions
     if 'player_y' not in st.session_state:
-        st.session_state.player_y = 60.0
+        st.session_state.player_y = 80.0
         st.session_state.player_x = 40.0
-        st.session_state.goalkeeper_y = 5.0
-        st.session_state.goalkeeper_x = 50.0
+        st.session_state.goalkeeper_y = 120.0
+        st.session_state.goalkeeper_x = 40.0
     
     # Display football pitch with positions
     st.subheader("⚽ Pitch & Shot Details")
