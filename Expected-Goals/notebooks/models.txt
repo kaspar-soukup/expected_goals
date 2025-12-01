@@ -1,0 +1,18 @@
+
+Somebody set this up:
+- create new training and testing dataset
+
+set seed
+split data equally
+metrics - AOC/ROC, true positive rate
+
+
+Timeline: Monday  24th of Nov.
+
+1.Logistic Regression - Guy
+2.Random Forest - Elisa
+3.Gradient Boosting Tree - Caleb, Mohan
+- sgboost, 
+4.Neural Networks - Kaspar
+
+mailto:xupengcheng1717@gmail.com

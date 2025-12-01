@@ -1,4 +1,11 @@
 pip
 python-dotenv
 ruff
+streamlit
+catboost
+scikit-learn
+pandas
+numpy
+matplotlib
+mplsoccer
 -e .
