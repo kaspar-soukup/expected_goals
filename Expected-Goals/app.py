@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 try:
     from catboost import CatBoostClassifier
 except ImportError:
-    st.error("❌ CatBoost not installed. Please run: pip install catboost")
+    st.error("CatBoost not installed. Please run: pip install catboost")
     st.stop()
 
 # Set page config
@@ -50,7 +50,7 @@ try:
     model, scaler, feature_columns, cont_cols = load_model_and_scaler()
     model_loaded = True
 except Exception as e:
-    st.error(f"❌ Error loading model: {str(e)}")
+    st.error(f"Error loading model: {str(e)}")
     model_loaded = False
 
 if model_loaded:
@@ -65,7 +65,7 @@ if model_loaded:
         st.session_state.goalkeeper_x = 40.0
     
     # Display football pitch with positions
-    st.subheader("⚽ Pitch & Shot Details")
+    st.subheader("Pitch & Shot Details")
     
     col_pitch, col_inputs = st.columns([1.5, 1])
     
@@ -102,7 +102,7 @@ if model_loaded:
             st.session_state.goalkeeper_x = st.number_input("GK Width (0-80)", min_value=0.0, max_value=80.0, value=st.session_state.goalkeeper_x, step=1.0, key="gk_width")
     
     with col_inputs:
-        st.subheader("🎯 Shot Details")
+        st.subheader("Shot Details")
         
         # Boolean features
         st.write("**Conditions:**")
@@ -141,7 +141,7 @@ if model_loaded:
     goalkeeper_x = st.session_state.goalkeeper_x
 
     # Create prediction button
-    if st.button("🔮 Predict Goal Probability", type="primary", use_container_width=True):
+    if st.button("Predict Goal Probability", type="primary", use_container_width=True):
         # Build input dataframe with all required features
         input_data = {}
         
