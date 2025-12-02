@@ -94,12 +94,12 @@ if model_loaded:
         
         col_pos1, col_pos2 = st.columns(2)
         with col_pos1:
-            st.session_state.player_y = st.number_input("Shooter Distance (0-120)", min_value=60.0, max_value=120.0, value=st.session_state.player_y, step=1.0, key="shooter_dist")
-            st.session_state.goalkeeper_y = st.number_input("GK Distance (0-120)", min_value=100.0, max_value=120.0, value=st.session_state.goalkeeper_y, step=1.0, key="gk_dist")
+            st.session_state.player_y = st.number_input("Shooter Distance (60-120)", min_value=60.0, max_value=120.0, value=st.session_state.player_y, step=1.0, key="shooter_dist")
+            st.session_state.goalkeeper_y = st.number_input("GK Distance (100-120)", min_value=100.0, max_value=120.0, value=st.session_state.goalkeeper_y, step=1.0, key="gk_dist")
         
         with col_pos2:
             st.session_state.player_x = st.number_input("Shooter Width (0-80)", min_value=0.0, max_value=80.0, value=st.session_state.player_x, step=1.0, key="shooter_width")
-            st.session_state.goalkeeper_x = st.number_input("GK Width (0-80)", min_value=20.0, max_value=60.0, value=st.session_state.goalkeeper_x, step=1.0, key="gk_width")
+            st.session_state.goalkeeper_x = st.number_input("GK Width (20-60)", min_value=20.0, max_value=60.0, value=st.session_state.goalkeeper_x, step=1.0, key="gk_width")
     
     with col_inputs:
         st.subheader("Shot Details")
