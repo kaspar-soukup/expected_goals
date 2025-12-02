@@ -218,7 +218,7 @@ if model_loaded:
             if prediction > 0.5:
                 assessment = "🟢 High"
                 description = "Likely Goal"
-            elif prediction > 0.2:
+            elif prediction > 0.15:
                 assessment = "🟡 Medium"
                 description = "Possible"
             else:
