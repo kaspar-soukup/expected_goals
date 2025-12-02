@@ -59,7 +59,7 @@ if model_loaded:
     
     # Initialize session state for positions
     if 'player_y' not in st.session_state:
-        st.session_state.player_y = 80.0
+        st.session_state.player_y = 105.0
         st.session_state.player_x = 40.0
         st.session_state.goalkeeper_y = 120.0
         st.session_state.goalkeeper_x = 40.0
@@ -228,4 +228,4 @@ if model_loaded:
         
         with col3:
             distance = np.sqrt((120 - player_y) ** 2 + (40 - player_x) ** 2)
-            st.metric("Distance to Goal", f"{distance:.1f} yds")
+            st.metric("Distance to Goal", f"{distance:.1f} meters")
