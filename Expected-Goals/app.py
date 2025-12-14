@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from catboost import CatBoostClassifier
+from sklearn.preprocessing import StandardScaler
 from mplsoccer import Pitch
 import matplotlib.pyplot as plt
 
@@ -11,16 +12,33 @@ st.title("⚽ Expected Goals Predictor")
 
 @st.cache_resource
 def load_model():
-    model = CatBoostClassifier()
-    model.load_model(Path(__file__).parent / "data/processed/catboost_model_custom.cbm")
-    return model
+    base_path = Path.cwd()
+    model_path = base_path / "Expected-Goals/data/processed/catboost_model_custom.cbm"
+    data_path = base_path / "Expected-Goals/data/processed/football_model_processed.pickle"
+    
+    if not model_path.exists():
+        model_path = Path("Expected-Goals/data/processed/catboost_model_custom.cbm")
+    if not data_path.exists():
+        data_path = Path("Expected-Goals/data/processed/football_model_processed.pickle")
+    
+    model = CatBoostClassifier(verbose=False)
+    model.load_model(str(model_path))
+    
+    df = pd.read_pickle(data_path)
+    X = df.drop(columns={'shot_outcome_encoded'})
+    
+    cont_cols = [col for col in X.columns if pd.api.types.is_numeric_dtype(X[col]) and X[col].nunique() > 2]
+    scaler = StandardScaler()
+    scaler.fit(X[cont_cols])
+    
+    return model, X.columns.tolist(), cont_cols, scaler
 
-model = load_model()
+model, feature_cols, cont_cols, scaler = load_model()
 
 if 'player_y' not in st.session_state:
     st.session_state.player_y = 100.0
     st.session_state.player_x = 40.0
-    st.session_state.goalkeeper_y = 120.0
+    st.session_state.goalkeeper_y = 100.0
     st.session_state.goalkeeper_x = 40.0
 
 col_pitch, col_inputs = st.columns([1.5, 1])
@@ -40,24 +58,39 @@ with col_pitch:
     st.pyplot(fig, use_container_width=True)
 
 with col_inputs:
-    st.subheader("Shot Details")
+    st.subheader("Position")
     
-    st.session_state.player_y = st.slider("Shooter Distance", 60.0, 120.0, st.session_state.player_y)
-    st.session_state.player_x = st.slider("Shooter Width", 0.0, 80.0, st.session_state.player_x)
-    st.session_state.goalkeeper_y = st.slider("GK Distance", 100.0, 120.0, st.session_state.goalkeeper_y)
-    st.session_state.goalkeeper_x = st.slider("GK Width", 0.0, 80.0, st.session_state.goalkeeper_x)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.session_state.player_y = st.number_input("Shooter Y", 60.0, 120.0, st.session_state.player_y, step=1.0)
+    with col2:
+        st.session_state.player_x = st.number_input("Shooter X", 0.0, 80.0, st.session_state.player_x, step=1.0)
     
-    st.write("**Conditions:**")
-    under_pressure = st.checkbox("Under Pressure")
-    open_goal = st.checkbox("Open Goal")
-    first_time = st.checkbox("First Time")
-    one_on_one = st.checkbox("One on One")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.session_state.goalkeeper_y = st.number_input("GK Y", 100.0, 120.0, st.session_state.goalkeeper_y, step=1.0)
+    with col2:
+        st.session_state.goalkeeper_x = st.number_input("GK X", 0.0, 80.0, st.session_state.goalkeeper_x, step=1.0)
     
-    st.write("**Type:**")
-    body_part = st.radio("Body Part", ["foot", "head", "other"])
-    shot_technique = st.radio("Technique", ["normal", "backheel", "diving_header", "half_volley", "lob", "overhead_kick", "volley"])
-    shot_type = st.radio("Shot Type", ["open_play", "free_kick"])
-    play_pattern = st.radio("Pattern", ["regular_play", "from_corner", "from_counter", "from_free_kick", "from_goal_kick", "from_keeper", "from_kick_off", "from_throw_in", "other"])
+    st.divider()
+    
+    st.subheader("Shot")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        body_part = st.selectbox("Body", ["foot", "head", "other"])
+        shot_type = st.selectbox("Type", ["open_play", "free_kick"])
+    with col2:
+        shot_technique = st.selectbox("Technique", ["normal", "backheel", "diving_header", "half_volley", "lob", "overhead_kick", "volley"])
+        play_pattern = st.selectbox("Pattern", ["regular_play", "from_corner", "from_counter", "from_free_kick", "from_goal_kick", "from_keeper", "from_kick_off", "from_throw_in", "other"])
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        under_pressure = st.checkbox("Under Pressure")
+        first_time = st.checkbox("First Time")
+    with col2:
+        open_goal = st.checkbox("Open Goal")
+        one_on_one = st.checkbox("One on One")
 
 if st.button("Predict", type="primary", use_container_width=True):
     player_y = st.session_state.player_y
@@ -101,11 +134,21 @@ if st.button("Predict", type="primary", use_container_width=True):
         'play_pattern_other': int(play_pattern == "other"),
     }
     
-    X = pd.DataFrame([features])
-    pred = model.predict_proba(X)[0][1]
+    X_input = pd.DataFrame([features])
+    
+    for col in feature_cols:
+        if col not in X_input.columns:
+            X_input[col] = 0
+    
+    X_input = X_input[feature_cols]
+    
+    X_input_scaled = X_input.copy()
+    X_input_scaled[cont_cols] = scaler.transform(X_input[cont_cols])
+    
+    pred = model.predict_proba(X_input_scaled)[0][1]
     
     st.divider()
     col1, col2, col3 = st.columns(3)
-    col1.metric("Goal Probability", f"{pred:.1%}")
-    col2.metric("Distance to Goal", f"{features['distance_from_goal_center']:.1f}m")
+    col1.metric("Probability", f"{pred:.1%}")
+    col2.metric("Distance", f"{features['distance_from_goal_center']:.1f}m")
     col3.metric("xG", f"{pred:.3f}")
