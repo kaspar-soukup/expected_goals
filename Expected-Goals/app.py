@@ -148,7 +148,6 @@ if st.button("Predict", type="primary", use_container_width=True):
     pred = model.predict_proba(X_input_scaled)[0][1]
     
     st.divider()
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(3)
     col1.metric("Probability", f"{pred:.1%}")
     col2.metric("Distance", f"{features['distance_from_goal_center']:.1f}m")
-    col3.metric("xG", f"{pred:.3f}")
