@@ -38,7 +38,7 @@ model, feature_cols, cont_cols, scaler = load_model()
 if 'player_y' not in st.session_state:
     st.session_state.player_y = 100.0
     st.session_state.player_x = 40.0
-    st.session_state.goalkeeper_y = 100.0
+    st.session_state.goalkeeper_y = 120.0
     st.session_state.goalkeeper_x = 40.0
 
 col_pitch, col_inputs = st.columns([1.5, 1])
@@ -70,7 +70,7 @@ with col_inputs:
     with col1:
         st.session_state.goalkeeper_y = st.number_input("GK Y", 100.0, 120.0, st.session_state.goalkeeper_y, step=1.0)
     with col2:
-        st.session_state.goalkeeper_x = st.number_input("GK X", 0.0, 80.0, st.session_state.goalkeeper_x, step=1.0)
+        st.session_state.goalkeeper_x = st.number_input("GK X", 20.0, 60.0, st.session_state.goalkeeper_x, step=1.0)
     
     st.divider()
     
